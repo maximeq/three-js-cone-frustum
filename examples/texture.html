@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ConeFrustum - Testing</title>
+</head>
+<body>
+
+<script src="../node_modules/three-full/builds/Three.umd.js"></script>
+<script>
+    var THREE = THREE || Three
+</script>
+<script src="../dist/browser/three-js-cone-frustum.js"></script>
+
+<script>
+
+    let width = 800;
+    let height = 450;
+
+    let frustum = new THREE.ConeFrustum(
+        new THREE.Vector3( 0, -1, 0 ),
+        new THREE.Vector3( 0, Math.cos( -Math.PI * 0.2 ), Math.sin( -Math.PI * 0.2 ) ),
+        2,
+        1.0,
+        2.0
+    )
+
+    let ray = new THREE.Ray( new THREE.Vector3( 0, 0, 4 ) );
+
+    let canvas = document.createElement("canvas");
+    document.body.appendChild(canvas);
+    canvas.width = width;
+    canvas.height = height;
+    let context = canvas.getContext('2d');
+
+    renderScene();
+
+
+    function raytraceFrustum( direction )
+    {
+        ray.direction = direction
+        return ray.intersectsConeFrustum( frustum )
+    }
+
+
+    function renderScene()
+    {
+        let array = new Uint8ClampedArray(4 * width * height);
+        array.fill(0);
+        let direction = new THREE.Vector3()
+        let uv = new THREE.Vector2()
+
+
+        for (let y = 0; y < height; y++) {
+            for (let x = 0; x < width; x++) {
+                let i = 4 * (y * width + x);
+                uv.set(x / (width - 1), y / (height - 1)).subScalar(0.5).multiplyScalar(2);
+                direction.set(uv.x * width / height, uv.y, -1.5);
+                direction.normalize();
+
+                if (y === 225 && x === 400)
+                    console.log("Midpoint")
+
+                let result = raytraceFrustum(direction)
+
+                if (result != null) {
+                    result.addScalar(1).multiplyScalar(0.5);
+
+                    array[i] = Math.round(255 * result.x);
+                    array[i+1] = Math.round(255 * result.y);
+                    array[i+2] = Math.round(255 * result.z);
+                    array[i+3] = 255
+                }
+
+                else
+                    array[i+3] = 255
+            }
+        }
+
+        let imgData = new ImageData(array, width, height)
+        context.putImageData(imgData, 0, 0);
+    }
+</script>
+
+</body>
+</html>
