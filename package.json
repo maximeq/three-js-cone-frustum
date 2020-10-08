@@ -1,0 +1,40 @@
+{
+  "name": "three-js-cone-frustum",
+  "version": "1.0.0",
+  "description": "THREE.JS ConeFrustum class, on the model of THREE.Sphere class.",
+  "main": "src/ConeFrustum.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "node build.js"
+  },
+  "dependencies": {
+    "three-full": "16.0.1"
+  },
+  "devDependencies": {
+    "fs-extra": "^7.0.1",
+    "rollup": "^0.67.1",
+    "rollup-plugin-commonjs": "^9.2.0",
+    "rollup-plugin-node-resolve": "^3.4.0",
+    "rollup-plugin-terser": "^3.0.0",
+    "rollup-plugin-prettier": "^0.6.0"
+  },
+  "files": [
+    "src/*",
+    "dist/*"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Mcgode/three-js-cone-frustum.git"
+  },
+  "keywords": [
+    "threejs"
+  ],
+  "browser": "./dist/browser/three-js-cone.js",
+  "author": "Max Godefroy <max@godefroy.net>, Maxime Quiblier <maximequiblier@gmail.com>",
+  "license": "MIT",
+  "hash": "cbb66061ffd05bc5f6673756895b3f6f03e7202a",
+  "bugs": {
+    "url": "https://github.com/Mcgode/three-js-cone-frustum/issues"
+  },
+  "homepage": "https://github.com/Mcgode/three-js-cone-frustum#readme"
+}
