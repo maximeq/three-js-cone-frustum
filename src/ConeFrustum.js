@@ -1,11 +1,14 @@
+const THREE = require("three-full");
+
+const Box3 = THREE.Box3
+const Vector3 = THREE.Vector3
+
 /**
  * @author Max Godefroy <max@godefroy.net>
  */
 
-import { Vector3, Box3 } from "three-full";
 
-
-export class ConeFrustum
+class ConeFrustum
 {
     /**
      * @param base      {?Vector3}
@@ -114,7 +117,6 @@ export class ConeFrustum
 }
 
 
-const THREE = require('three-full');
 THREE.ConeFrustum = ConeFrustum;
 
 

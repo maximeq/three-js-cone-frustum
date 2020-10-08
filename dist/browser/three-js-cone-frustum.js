@@ -1,8 +1,13 @@
 (function (global, factory) {
-   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('three-full')) :
-   typeof define === 'function' && define.amd ? define(['exports', 'three-full'], factory) :
-   (factory((global.THREEConeFrustum = {}),global.THREE));
-}(this, (function (exports,threeFull) { 'use strict';
+   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('three-full')) :
+   typeof define === 'function' && define.amd ? define(['three-full'], factory) :
+   (global.THREEConeFrustum = factory(global.THREE));
+}(this, (function (threeFull) { 'use strict';
+
+   threeFull = threeFull && threeFull.hasOwnProperty('default') ? threeFull['default'] : threeFull;
+
+   const Box3 = threeFull.Box3;
+   const Vector3 = threeFull.Vector3;
 
    /**
     * @author Max Godefroy <max@godefroy.net>
@@ -20,9 +25,9 @@
         */
        constructor( base, axis, height, radius0, radius1 )
        {
-           this.base = base || new threeFull.Vector3();
+           this.base = base || new Vector3();
 
-           this.axis = axis || new threeFull.Vector3( 0, 1, 0 );
+           this.axis = axis || new Vector3( 0, 1, 0 );
            this.axis.normalize();
 
            this.height = height || 1;
@@ -40,7 +45,7 @@
         */
        static fromCapsule( center0, radius0, center1, radius1 )
        {
-           let axis = new threeFull.Vector3();
+           let axis = new Vector3();
            axis.subVectors( center1, center0 );
            return new ConeFrustum( center0, axis.clone().normalize(), axis.length(), radius0, radius1 )
        }
@@ -77,7 +82,7 @@
        getBoundingBox( target )
        {
            let c = this.base.clone();
-           let d = new threeFull.Vector3();
+           let d = new Vector3();
 
            d.set(
                Math.sqrt( 1.0 * this.axis.x * this.axis.x ),
@@ -86,13 +91,13 @@
            );
            d.multiplyScalar( this.radius0 );
 
-           let box1 = new threeFull.Box3( new threeFull.Vector3().subVectors(c, d), new threeFull.Vector3().addVectors(c, d) );
+           let box1 = new Box3( new Vector3().subVectors(c, d), new Vector3().addVectors(c, d) );
 
            d.divideScalar(this.radius0);
            d.multiplyScalar(this.radius1);
 
            c.addScaledVector(this.axis, this.height);
-           let box2 = new threeFull.Box3( new threeFull.Vector3().subVectors(c, d), new threeFull.Vector3().addVectors(c, d) );
+           let box2 = new Box3( new Vector3().subVectors(c, d), new Vector3().addVectors(c, d) );
 
            box1.union(box2);
 
@@ -118,15 +123,14 @@
    }
 
 
-   const THREE = require('three-full');
-   THREE.ConeFrustum = ConeFrustum;
+   threeFull.ConeFrustum = ConeFrustum;
 
 
-   THREE.Ray.prototype.intersectsConeFrustum = function ()
+   threeFull.Ray.prototype.intersectsConeFrustum = function ()
    {
-      let D = new threeFull.Vector3();
-      let target2 = new threeFull.Vector3();
-      let u = new threeFull.Vector3();
+      let D = new Vector3();
+      let target2 = new Vector3();
+      let u = new Vector3();
 
       return function ( frustum, target )
       {
@@ -213,8 +217,10 @@
       }
    }();
 
-   exports.ConeFrustum = ConeFrustum;
+   var ConeFrustum_1 = {
 
-   Object.defineProperty(exports, '__esModule', { value: true });
+   };
+
+   return ConeFrustum_1;
 
 })));
