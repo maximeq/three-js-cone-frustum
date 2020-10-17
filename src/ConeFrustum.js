@@ -3,6 +3,8 @@ const THREE = require("three-full");
 const Box3 = THREE.Box3
 const Vector3 = THREE.Vector3
 
+var tmpv = new Vector3();
+
 /**
  * @author Max Godefroy <max@godefroy.net>
  */
@@ -44,6 +46,28 @@ class ConeFrustum
         return new ConeFrustum( center0, axis.clone().normalize(), axis.length(), radius0, radius1 )
     }
 
+    /**
+     *  Project the given point on the axis, in a direction orthogonal to the cone frustum surface.
+     **/
+    orthogonalProject(p, target){
+        // We will work in 2D, in the orthogonal basis x = this.axis and y = orthogonal vector to this.axis in the plane (this.basis, p, this.basis + this.axis),
+        // and such that p has positive y coordinate in this basis.
+        // The wanted projection is the point at the intersection of:
+        //  - the local X axis (computation in the unit_dir basis)
+        //  and
+        //  - the line defined by P and the vector orthogonal to the weight line
+        var baseToP = tmpv;
+        baseToP.subVectors(p, this.base);
+        var baseToPlsq = baseToP.lengthSq();
+        var p2Dx = baseToP.dot(this.axis);
+        // pythagore inc.
+        var p2DySq = baseToPlsq - p2Dx*p2Dx;
+        var p2Dy = p2DySq > 0 ? Math.sqrt(p2DySq) : 0; // because of rounded errors tmp can be <0 and this causes the next sqrt to return NaN...
+
+        var t = p2Dx - p2Dy*(this.r0 - this.r1)/this.h;
+
+        target.copy(this.axis).multiplyScalar(t).add(this.base);
+    }
 
     /**
      * @param frustum   {!ConeFrustum}

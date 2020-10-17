@@ -1,6 +1,6 @@
 {
   "name": "three-js-cone-frustum",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "THREE.JS ConeFrustum class, on the model of THREE.Sphere class.",
   "main": "src/ConeFrustum.js",
   "scripts": {
