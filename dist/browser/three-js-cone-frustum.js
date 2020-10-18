@@ -70,7 +70,7 @@
            var p2DySq = baseToPlsq - p2Dx*p2Dx;
            var p2Dy = p2DySq > 0 ? Math.sqrt(p2DySq) : 0; // because of rounded errors tmp can be <0 and this causes the next sqrt to return NaN...
 
-           var t = p2Dx - p2Dy*(this.r0 - this.r1)/this.h;
+           var t = p2Dx - p2Dy*(this.radius0 - this.radius1)/this.height;
 
            target.copy(this.axis).multiplyScalar(t).add(this.base);
        }
