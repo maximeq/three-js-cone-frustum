@@ -41,9 +41,17 @@ class ConeFrustum
      */
     static fromCapsule( center0, radius0, center1, radius1 )
     {
-        let axis = new Vector3();
-        axis.subVectors( center1, center0 )
-        return new ConeFrustum( center0, axis.clone().normalize(), axis.length(), radius0, radius1 )
+        let axis = new Vector3().subVectors( center1, center0 );
+
+        if (axis.length() === 0)
+            throw "Capsule height must not be zero"
+
+        let sinTheta = (radius1 - radius0) / axis.length()
+        let height = axis.length() + sinTheta * (radius0 - radius1)
+        let base = new Vector3().copy(center0).addScaledVector(axis.normalize(), sinTheta * radius0)
+        let cosTheta = Math.cos(Math.asin(sinTheta))
+
+        return new ConeFrustum( base, axis, height, radius0 * cosTheta, radius1 * cosTheta )
     }
 
     /**
