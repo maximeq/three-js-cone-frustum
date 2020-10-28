@@ -11,7 +11,10 @@
     "three-full": "16.0.1"
   },
   "devDependencies": {
-    "fs-extra": "^7.0.1",
+    "eslint": "^7.11.0",
+    "eslint-config-mdcs": "^5.0.0",
+    "http-server": "^0.12.3",
+    "fs-extra": "^9.0.1",
     "rollup": "^0.67.1",
     "rollup-plugin-commonjs": "^9.2.0",
     "rollup-plugin-node-resolve": "^3.4.0",
