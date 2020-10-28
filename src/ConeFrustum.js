@@ -158,14 +158,17 @@ class ConeFrustum {
 
 		const r = Math.max( this.radius0, this.radius1 );
 		tmpMat.makeScale( r, this.height / 2, r );
-		tmpMat.multiply( tmpMat );
 		tmpMat.applyToBufferAttribute( attribute );
 
 		tmpVec.set( 0, 1, 0 );
 		const angle = tmpVec.angleTo( this.axis );
-		tmpVec.cross( this.axis );
-		tmpMat.makeRotationAxis( tmpVec, angle );
-		tmpMat.applyToBufferAttribute( attribute );
+		tmpVec.cross( this.axis ).normalize();
+		if ( tmpVec.length() > 0 ) {
+
+			tmpMat.makeRotationAxis( tmpVec, angle );
+			tmpMat.applyToBufferAttribute( attribute );
+
+		}
 
 		tmpVec.copy( this.base ).addScaledVector( this.axis, this.height / 2 ).sub( origin );
 	    tmpMat.makeTranslation( tmpVec.x, tmpVec.y, tmpVec.z );

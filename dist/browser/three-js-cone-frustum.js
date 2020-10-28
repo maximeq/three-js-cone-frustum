@@ -52,14 +52,14 @@
 	     */
 		static fromCapsule( center0, radius0, center1, radius1 ) {
 
-			const axis = tmpVec.subVectors( center1, center0 );
+			const axis = new Vector3().subVectors( center1, center0 );
 
 			if ( axis.length() === 0 )
 				throw "Capsule height must not be zero";
 
 			const sinTheta = ( radius1 - radius0 ) / axis.length();
 			const height = axis.length() + sinTheta * ( radius0 - radius1 );
-			const base = new Vector3().copy( center0 ).addScaledVector( axis.normalize(), sinTheta * radius0 );
+			const base = new Vector3().copy( center0 ).addScaledVector( axis.normalize(), - sinTheta * radius0 );
 			const cosTheta = Math.cos( Math.asin( sinTheta ) );
 
 			return new ConeFrustum( base, axis, height, radius0 * cosTheta, radius1 * cosTheta );
@@ -164,14 +164,17 @@
 
 			const r = Math.max( this.radius0, this.radius1 );
 			tmpMat.makeScale( r, this.height / 2, r );
-			tmpMat.multiply( tmpMat );
 			tmpMat.applyToBufferAttribute( attribute );
 
 			tmpVec.set( 0, 1, 0 );
 			const angle = tmpVec.angleTo( this.axis );
-			tmpVec.cross( this.axis );
-			tmpMat.makeRotationAxis( tmpVec, angle );
-			tmpMat.applyToBufferAttribute( attribute );
+			tmpVec.cross( this.axis ).normalize();
+			if ( tmpVec.length() > 0 ) {
+
+				tmpMat.makeRotationAxis( tmpVec, angle );
+				tmpMat.applyToBufferAttribute( attribute );
+
+			}
 
 			tmpVec.copy( this.base ).addScaledVector( this.axis, this.height / 2 ).sub( origin );
 		    tmpMat.makeTranslation( tmpVec.x, tmpVec.y, tmpVec.z );
