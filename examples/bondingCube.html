@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ConeFrustum - Optimised bounding cube</title>
+
+    <style>
+        body {
+            color: #000;
+            font-family: Monospace, sans-serif;
+            font-size:13px;
+            text-align:center;
+            font-weight: bold;
+
+            background-color: #fff;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        #info {
+            color:#000;
+            position: absolute;
+            top: 0; width: 100%;
+            padding: 5px;
+
+        }
+
+        a {
+            color: red;
+        }
+    </style>
+</head>
+
+<body>
+
+<script src="../node_modules/three-full/builds/Three.iife.js"></script>
+<script>
+    var THREE = THREE || Three
+</script>
+
+<script src="../dist/browser/three-js-cone-frustum.js"></script>
+
+<script>
+    let renderer = new THREE.WebGLRenderer()
+    document.body.appendChild(renderer.domElement)
+    renderer.setClearColor( '#ffffff' )
+    renderer.setClearAlpha( 1 )
+
+    let scene = new THREE.Scene();
+
+    let camera = new THREE.PerspectiveCamera( 75 );
+    camera.position.setZ(40)
+
+    let controls = new THREE.OrbitControls( camera, renderer.domElement )
+    controls.addEventListener( 'change', render );
+    controls.enableDamping = true; // An animation loop is required when either damping or auto-rotation are enabled
+    controls.dampingFactor = 0.1;
+    controls.screenSpacePanning = false;
+    controls.minDistance = 10;
+    controls.maxDistance = 1000;
+    controls.keys = null;
+
+    let geom = new THREE.BufferGeometry();
+
+    let coneFrustum = THREE.ConeFrustum.fromCapsule(
+        new THREE.Vector3(), 4,
+        new THREE.Vector3(10, 10, 0), 1
+    );
+    let positions = coneFrustum.computeOptimisedBoundingCube( new THREE.Vector3() );
+    geom.addAttribute('position', new THREE.BufferAttribute(positions, 3))
+    geom.computeVertexNormals();
+
+    let mesh = new THREE.Mesh(geom, new THREE.MeshPhongMaterial({ color: 0xffaa00 }))
+    scene.add(mesh);
+
+    let light = new THREE.HemisphereLight( 0xffffff, 0xaaaaaa );
+    scene.add( light );
+
+    updateScreen()
+    window.onresize = updateScreen;
+
+
+    function updateScreen()
+    {
+        renderer.setSize( window.innerWidth, window.innerHeight )
+        camera.aspect = window.innerWidth / window.innerHeight
+        camera.updateProjectionMatrix()
+
+        render()
+    }
+
+
+    function render() {
+        renderer.render(scene, camera)
+    }
+</script>
+
+</body>
+</html>
