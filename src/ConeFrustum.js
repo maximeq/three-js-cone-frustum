@@ -5,9 +5,9 @@ const Vector3 = THREE.Vector3;
 const Matrix4 = THREE.Matrix4;
 const BoxBufferGeometry = THREE.BoxBufferGeometry;
 
-const tmpV1 = new Vector3(), tmpV2 = new Vector3();
-const tmpM1 = new Matrix4(), tmpM2 = new Matrix4();
-const baseCubePositions = new BoxBufferGeometry( 2, 2, 2 ).attributes.position;
+const tmpVec = new Vector3();
+const tmpMat = new Matrix4();
+const baseCubePositions = new BoxBufferGeometry( 2, 2, 2 ).toNonIndexed().attributes.position;
 
 /**
  * @author Max Godefroy <max@godefroy.net>
@@ -46,7 +46,7 @@ class ConeFrustum {
      */
 	static fromCapsule( center0, radius0, center1, radius1 ) {
 
-		const axis = new Vector3().subVectors( center1, center0 );
+		const axis = tmpVec.subVectors( center1, center0 );
 
 		if ( axis.length() === 0 )
 			throw "Capsule height must not be zero";
@@ -71,7 +71,7 @@ class ConeFrustum {
 		//  - the local X axis (computation in the unit_dir basis)
 		//  and
 		//  - the line defined by P and the vector orthogonal to the weight line
-		const baseToP = tmpV1;
+		const baseToP = tmpVec;
 		baseToP.subVectors( p, this.base );
 		const baseToPlsq = baseToP.lengthSq();
 		const p2Dx = baseToP.dot( this.axis );
@@ -115,6 +115,7 @@ class ConeFrustum {
 
 	/**
      * @param target    {?Box3}
+	 * @returns {!Box3}
      */
 	getBoundingBox( target ) {
 
@@ -147,31 +148,30 @@ class ConeFrustum {
 
 
 	/**
-     * @returns {Float32Array} The cube position vertex coordinates as a flat array
+	 * @param {!Vector3} origin		The origin for the current coordinate space
+	 *
+     * @returns {Float32Array} 		The cube position vertex coordinates as a flat array
      */
 	computeOptimisedBoundingCube( origin ) {
 
-	    const baseAttribute = baseCubePositions.clone();
-
-	    tmpV1.copy( this.base ).addScaledVector( this.axis, this.height / 2 );
+	    const attribute = baseCubePositions.clone();
 
 		const r = Math.max( this.radius0, this.radius1 );
-		tmpM2.makeScale( r, this.height / 2, r );
-		tmpM1.multiply( tmpM2 );
-		tmpM2.applyToBufferAttribute( baseAttribute );
+		tmpMat.makeScale( r, this.height / 2, r );
+		tmpMat.multiply( tmpMat );
+		tmpMat.applyToBufferAttribute( attribute );
 
-		tmpV2.set( 0, 1, 0 );
-		const angle = tmpV2.angleTo( this.axis );
-		tmpV2.cross( this.axis );
-		tmpM2.makeRotationAxis( tmpV2, angle );
-		tmpM2.applyToBufferAttribute( baseAttribute );
+		tmpVec.set( 0, 1, 0 );
+		const angle = tmpVec.angleTo( this.axis );
+		tmpVec.cross( this.axis );
+		tmpMat.makeRotationAxis( tmpVec, angle );
+		tmpMat.applyToBufferAttribute( attribute );
 
-	    tmpV1.sub( origin );
-	    tmpM1.makeTranslation( tmpV1.x, tmpV1.y, tmpV1.z );
-	    tmpM1.applyToBufferAttribute( baseAttribute );
+		tmpVec.copy( this.base ).addScaledVector( this.axis, this.height / 2 ).sub( origin );
+	    tmpMat.makeTranslation( tmpVec.x, tmpVec.y, tmpVec.z );
+	    tmpMat.applyToBufferAttribute( attribute );
 
-	    // baseAttribute.applyMatrix4( tmpM1 );
-	    return baseAttribute.array;
+	    return attribute.array;
 
 	}
 

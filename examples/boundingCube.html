@@ -58,7 +58,7 @@
     controls.screenSpacePanning = false;
     controls.minDistance = 10;
     controls.maxDistance = 1000;
-    controls.keys = null;
+    controls.keys = { UP: 0, DOWN: 0, LEFT: 0, RIGHT: 0 };
 
     let geom = new THREE.BufferGeometry();
 
@@ -71,6 +71,7 @@
     geom.computeVertexNormals();
 
     let mesh = new THREE.Mesh(geom, new THREE.MeshPhongMaterial({ color: 0xffaa00 }))
+    mesh.material.side = THREE.DoubleSide
     scene.add(mesh);
 
     let light = new THREE.HemisphereLight( 0xffffff, 0xaaaaaa );
