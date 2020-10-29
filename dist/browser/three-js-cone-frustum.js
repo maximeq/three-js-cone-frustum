@@ -11,7 +11,7 @@
 	const Matrix4 = threeFull.Matrix4;
 	const BoxBufferGeometry = threeFull.BoxBufferGeometry;
 
-	const tmpVec = new Vector3();
+	const tmpVec = new Vector3(), tmpVec1 = new Vector3(), tmpVec2 = new Vector3(), tmpVec3 = new Vector3();
 	const tmpMat = new Matrix4();
 	const baseCubePositions = new BoxBufferGeometry( 2, 2, 2 ).toNonIndexed().attributes.position;
 
@@ -28,6 +28,7 @@
 	     * @param height    {?number}
 	     * @param radius0   {?number}
 	     * @param radius1   {?number}
+		 * @param minScaleTop  {?Vector3}
 	     */
 		constructor( base, axis, height, radius0, radius1 ) {
 
@@ -51,6 +52,9 @@
 	     * @returns {ConeFrustum}
 	     */
 		static fromCapsule( center0, radius0, center1, radius1 ) {
+
+			if ( radius0 > radius1 )
+				return this.fromCapsule( center1, radius1, center0, radius0 );
 
 			const axis = new Vector3().subVectors( center1, center0 );
 
@@ -181,6 +185,55 @@
 		    tmpMat.applyToBufferAttribute( attribute );
 
 		    return attribute.array;
+
+		}
+
+
+		/**
+		 * @param {!Vector3} center0
+		 * @param {!number} radius0
+		 * @param {!Vector3} center1
+		 * @param {!number} radius1
+		 * @param {!Vector3} origin		The origin for the current coordinate space
+		 * @param {?number} minScale
+		 *
+		 * @returns {Float32Array} 		The cube position vertex coordinates as a flat array
+		 */
+		static computeOptimisedDownscalingBoundingCube( center0, radius0, center1, radius1, origin, minScale ) {
+
+			if ( radius0 > radius1 )
+				return this.computeOptimisedDownscalingBoundingCube( center1, radius1, center0, radius0, origin, minScale );
+
+			const tmpVec1 = new Vector3().subVectors( center1, center0 );
+
+			if ( tmpVec1.length() === 0 )
+				throw "Capsule height must not be zero";
+
+			const sinTheta = ( radius1 - radius0 ) / tmpVec1.length();
+			const height = tmpVec1.length() + sinTheta * ( radius0 - ( minScale ) * radius1 );
+			tmpVec2.copy( center0 ).addScaledVector( tmpVec1.normalize(), - sinTheta * radius0 );
+
+			const attribute = baseCubePositions.clone();
+
+			const r = Math.max( radius0, radius1 );
+			tmpMat.makeScale( r, height / 2, r );
+			tmpMat.applyToBufferAttribute( attribute );
+
+			tmpVec.set( 0, 1, 0 );
+			const angle = tmpVec.angleTo( tmpVec1 );
+			tmpVec.cross( tmpVec1 ).normalize();
+			if ( tmpVec.length() > 0 ) {
+
+				tmpMat.makeRotationAxis( tmpVec, angle );
+				tmpMat.applyToBufferAttribute( attribute );
+
+			}
+
+			tmpVec.copy( tmpVec2 ).addScaledVector( tmpVec1, height / 2 ).sub( origin );
+			tmpMat.makeTranslation( tmpVec.x, tmpVec.y, tmpVec.z );
+			tmpMat.applyToBufferAttribute( attribute );
+
+			return attribute.array;
 
 		}
 
