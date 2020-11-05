@@ -213,7 +213,7 @@
 
 			const sinTheta = ( radius1 - radius0 ) / tmpVec1.length();
 			const cosTheta = Math.cos( Math.asin( sinTheta ) );
-			const height = tmpVec1.length() + sinTheta * ( radius0 - ( minScale ) * radius1 );
+			const height = tmpVec1.length() + sinTheta * ( radius0 - ( minScale * minScale ) * radius1 );
 			const unscaledHeight = tmpVec1.length() + sinTheta * ( radius0 - radius1 );
 			tmpVec2.copy( center0 ).addScaledVector( tmpVec1.normalize(), - sinTheta * radius0 );
 
