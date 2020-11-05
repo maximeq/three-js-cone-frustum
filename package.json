@@ -11,6 +11,7 @@
     "three-full": "16.0.1"
   },
   "devDependencies": {
+    "dat.gui": "^0.7.7",
     "eslint": "^7.11.0",
     "eslint-config-mdcs": "^5.0.0",
     "http-server": "^0.12.3",
