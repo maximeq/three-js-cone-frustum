@@ -96,9 +96,11 @@
     let light = new THREE.HemisphereLight( 0xffffff, 0xaaaaaa, 2.0 );
     scene.add( light );
 
-    scene.add(new THREE.AxesHelper(20));
+    let axes = new THREE.AxesHelper(20);
+    scene.add(axes);
 
-    scene.add( new THREE.GridHelper(40) );
+    let grid = new THREE.GridHelper(40);
+    scene.add( grid );
 
     updateScreen()
     window.onresize = updateScreen;
@@ -183,6 +185,18 @@
     gui.add(params, "C1_Y", -20, 20, 0.5).onChange(updateGeom)
     gui.add(params, "C1_Z", -20, 20, 0.5).onChange(updateGeom)
     gui.add(params, "R1", 0, 10, 0.2).onChange(updateGeom)
+    gui.add(params, "Scale", 0, 1, 0.1).onChange(updateGeom)
+
+
+    gui.add(params, "Grid").onChange(() => {
+        grid.visible = params.Grid
+        render();
+    })
+
+    gui.add(params, "Axes").onChange(() => {
+        axes.visible = params.Axes;
+        render()
+    })
 </script>
 
 </body>
