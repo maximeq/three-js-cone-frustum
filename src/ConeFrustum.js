@@ -211,7 +211,7 @@ class ConeFrustum {
 
 		const attribute = baseCubePositions.clone();
 
-		const r = Math.max( radius0, radius1 );
+		const r = radius1 * Math.cos( Math.asin( sinTheta ) );
 		tmpMat.makeScale( r, height / 2, r );
 		tmpMat.applyToBufferAttribute( attribute );
 

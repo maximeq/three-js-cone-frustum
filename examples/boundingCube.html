@@ -128,7 +128,7 @@
         let v = new THREE.Vector3();
         let coneFrustum = THREE.ConeFrustum.fromCapsule( c0, params.R0, c1, params.R1 );
 
-        helperMesh.geometry = new THREE.CylinderBufferGeometry( params.R0, params.R1, coneFrustum.height );
+        helperMesh.geometry = new THREE.CylinderBufferGeometry( coneFrustum.radius1, coneFrustum.radius0, coneFrustum.height );
         helperMesh.position.copy( coneFrustum.base ).addScaledVector(coneFrustum.axis, coneFrustum.height / 2);
 
         helperMesh.rotation.set(0, 0, 0)
@@ -137,9 +137,9 @@
         const d = v.dot(coneFrustum.axis);
         v.cross( coneFrustum.axis ).normalize();
         if ( v.length() > 0 )
-            helperMesh.rotateOnWorldAxis( v, angle + (params.R0 < params.R1 ? Math.PI : 0) );
+            helperMesh.rotateOnWorldAxis( v, angle );
         else
-            helperMesh.rotateZ( (params.R0 < params.R1 ? Math.PI : 0) + (d < 0 ? Math.PI : 0));
+            helperMesh.rotateZ((d < 0 ? Math.PI : 0));
 
 
         helperMesh.needsUpdate = true
