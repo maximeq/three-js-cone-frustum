@@ -66,17 +66,23 @@
         C0_Y: 0,
         C0_Z: 0,
         R0: 4,
-        C1_X: 10,
+        C1_X: 0,
         C1_Y: 10,
-        C1_Z: 10,
+        C1_Z: 0,
         R1: 1,
     }
 
     let geom = new THREE.BufferGeometry();
 
-    let mesh = new THREE.Mesh(computeGeometry(), new THREE.MeshStandardMaterial({ color: 0xffaa00 }))
+    let mesh = new THREE.Mesh(new THREE.BoxBufferGeometry(), new THREE.MeshStandardMaterial({ color: 0xffaa00 }))
     mesh.material.side = THREE.DoubleSide
     scene.add(mesh);
+
+    let helperMesh = new THREE.Mesh( new THREE.CylinderBufferGeometry(0.5, 0.5, 1), new THREE.MeshLambertMaterial({ color: 0xff0000 }))
+    helperMesh.material.wireframe = true;
+    helperMesh.material.depthTest = false;
+    helperMesh.material.depthWrite = false;
+    scene.add(helperMesh);
 
     let light = new THREE.HemisphereLight( 0xffffff, 0xaaaaaa, 2.0 );
     scene.add( light );
@@ -87,6 +93,7 @@
 
     updateScreen()
     window.onresize = updateScreen;
+    updateGeom();
 
 
     function updateScreen()
@@ -99,16 +106,45 @@
     }
 
 
-    function computeGeometry() {
+    function updateGeom()
+    {
         let geom = new THREE.BufferGeometry();
+
+        let c0 = new THREE.Vector3( params.C0_X, params.C0_Y, params.C0_Z );
+        let c1 = new THREE.Vector3( params.C1_X, params.C1_Y, params.C1_Z );
+
+
         let positions = THREE.ConeFrustum.computeOptimisedDownscalingBoundingCube(
-            new THREE.Vector3( params.C0_X, params.C0_Y, params.C0_Z ), params.R0,
-            new THREE.Vector3( params.C1_X, params.C1_Y, params.C1_Z ), params.R1,
-            new THREE.Vector3(), 0
+            c0, params.R0,
+            c1, params.R1,
+            new THREE.Vector3(), 1
         );
         geom.addAttribute('position', new THREE.BufferAttribute(positions, 3))
         geom.computeVertexNormals();
-        return geom;
+
+        mesh.geometry = geom;
+        mesh.needsUpdate = true;
+
+        let v = new THREE.Vector3();
+        let coneFrustum = THREE.ConeFrustum.fromCapsule( c0, params.R0, c1, params.R1 );
+
+        helperMesh.geometry = new THREE.CylinderBufferGeometry( params.R0, params.R1, coneFrustum.height );
+        helperMesh.position.copy( coneFrustum.base ).addScaledVector(coneFrustum.axis, coneFrustum.height / 2);
+
+        helperMesh.rotation.set(0, 0, 0)
+        v.set( 0, 1, 0 );
+        const angle = v.angleTo( coneFrustum.axis );
+        const d = v.dot(coneFrustum.axis);
+        v.cross( coneFrustum.axis ).normalize();
+        if ( v.length() > 0 )
+            helperMesh.rotateOnWorldAxis( v, angle + (params.R0 < params.R1 ? Math.PI : 0) );
+        else
+            helperMesh.rotateZ( (params.R0 < params.R1 ? Math.PI : 0) + (d < 0 ? Math.PI : 0));
+
+
+        helperMesh.needsUpdate = true
+
+        render();
     }
 
 
@@ -127,12 +163,6 @@
     gui.add(params, "C1_Y", -20, 20, 0.5).onChange(updateGeom)
     gui.add(params, "C1_Z", -20, 20, 0.5).onChange(updateGeom)
     gui.add(params, "R1", 0, 10, 0.2).onChange(updateGeom)
-
-    function updateGeom() {
-        mesh.geometry = computeGeometry();
-        mesh.needsUpdate = true;
-        render();
-    }
 </script>
 
 </body>
