@@ -158,6 +158,8 @@
 
 
 		/**
+		 * @deprecated Use `ConeFrustum.computeOptimisedDownscalingBoundingCube` instead
+		 *
 		 * @param {!Vector3} origin		The origin for the current coordinate space
 		 *
 	     * @returns {Float32Array} 		The cube position vertex coordinates as a flat array
