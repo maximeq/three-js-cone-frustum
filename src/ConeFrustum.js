@@ -127,9 +127,9 @@ class ConeFrustum {
 		const d = new Vector3();
 
 		d.set(
-			Math.sqrt( 1.0 * this.axis.x * this.axis.x ),
-			Math.sqrt( 1.0 * this.axis.y * this.axis.y ),
-			Math.sqrt( 1.0 * this.axis.z * this.axis.z ),
+			Math.sqrt( 1.0 - this.axis.x * this.axis.x ),
+			Math.sqrt( 1.0 - this.axis.y * this.axis.y ),
+			Math.sqrt( 1.0 - this.axis.z * this.axis.z ),
 		);
 		d.multiplyScalar( this.radius0 );
 
