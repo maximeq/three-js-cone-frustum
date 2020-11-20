@@ -40,6 +40,8 @@
 
 <script src="../dist/browser/three-js-cone-frustum.js"></script>
 
+<script src="../node_modules/dat.gui/build/dat.gui.min.js"></script>
+
 <script>
     let renderer = new THREE.WebGLRenderer()
     document.body.appendChild(renderer.domElement)
@@ -55,30 +57,54 @@
     controls.addEventListener( 'change', render );
     controls.enableDamping = true; // An animation loop is required when either damping or auto-rotation are enabled
     controls.dampingFactor = 0.1;
-    controls.screenSpacePanning = false;
     controls.minDistance = 10;
     controls.maxDistance = 1000;
     controls.keys = { UP: 0, DOWN: 0, LEFT: 0, RIGHT: 0 };
 
+    let params = {
+        C0_X: 0,
+        C0_Y: 0,
+        C0_Z: 0,
+        R0: 4,
+        C1_X: 0,
+        C1_Y: 10,
+        C1_Z: 0,
+        R1: 1,
+        Scale: 0.5,
+        Grid: true,
+        Axes: true,
+    }
+
     let geom = new THREE.BufferGeometry();
 
-    let coneFrustum = THREE.ConeFrustum.fromCapsule(
-        new THREE.Vector3(), 4,
-        new THREE.Vector3(10, 10, 0), 1
-    );
-    let positions = coneFrustum.computeOptimisedBoundingCube( new THREE.Vector3() );
-    geom.addAttribute('position', new THREE.BufferAttribute(positions, 3))
-    geom.computeVertexNormals();
-
-    let mesh = new THREE.Mesh(geom, new THREE.MeshPhongMaterial({ color: 0xffaa00 }))
+    let mesh = new THREE.Mesh(new THREE.BoxBufferGeometry(), new THREE.MeshStandardMaterial({ color: 0xffaa00 }))
     mesh.material.side = THREE.DoubleSide
     scene.add(mesh);
 
-    let light = new THREE.HemisphereLight( 0xffffff, 0xaaaaaa );
+    let helperMesh = new THREE.Mesh( new THREE.CylinderBufferGeometry(0.5, 0.5, 1), new THREE.MeshLambertMaterial({ color: 0xff0000 }))
+    helperMesh.material.wireframe = true;
+    helperMesh.material.depthTest = false;
+    helperMesh.material.depthWrite = false;
+    scene.add(helperMesh);
+
+    let downscaledHelperMesh = new THREE.Mesh( new THREE.CylinderBufferGeometry(0.5, 0.5, 1), new THREE.MeshLambertMaterial({ color: 0x00ff00 }))
+    downscaledHelperMesh.material.wireframe = true;
+    downscaledHelperMesh.material.depthTest = false;
+    downscaledHelperMesh.material.depthWrite = false;
+    scene.add(downscaledHelperMesh);
+
+    let light = new THREE.HemisphereLight( 0xffffff, 0xaaaaaa, 2.0 );
     scene.add( light );
+
+    let axes = new THREE.AxesHelper(20);
+    scene.add(axes);
+
+    let grid = new THREE.GridHelper(40);
+    scene.add( grid );
 
     updateScreen()
     window.onresize = updateScreen;
+    updateGeom();
 
 
     function updateScreen()
@@ -91,9 +117,86 @@
     }
 
 
+    function updateGeom()
+    {
+        let geom = new THREE.BufferGeometry();
+
+        let c0 = new THREE.Vector3( params.C0_X, params.C0_Y, params.C0_Z );
+        let c1 = new THREE.Vector3( params.C1_X, params.C1_Y, params.C1_Z );
+
+        let positions = THREE.ConeFrustum.computeOptimisedDownscalingBoundingCube(
+            c0, params.R0,
+            c1, params.R1,
+            new THREE.Vector3(), params.Scale
+        );
+        geom.addAttribute('position', new THREE.BufferAttribute(positions, 3))
+        geom.computeVertexNormals();
+
+        mesh.geometry = geom;
+        mesh.needsUpdate = true;
+
+        updateHelperMesh(helperMesh);
+        updateHelperMesh(downscaledHelperMesh, params.Scale)
+        downscaledHelperMesh.visible = params.Scale < 1;
+
+        render();
+    }
+
+
+    function updateHelperMesh( helperMesh, scale )
+    {
+        scale = scale == null ? 1 : scale;
+        let c0 = new THREE.Vector3( params.C0_X, params.C0_Y, params.C0_Z );
+        let c1 = new THREE.Vector3( params.C1_X, params.C1_Y, params.C1_Z );
+
+        let v = new THREE.Vector3();
+        let coneFrustum = THREE.ConeFrustum.fromCapsule( c0, params.R0 * scale, c1, params.R1 * scale );
+
+        helperMesh.geometry = new THREE.CylinderBufferGeometry( coneFrustum.radius1, coneFrustum.radius0, coneFrustum.height );
+        helperMesh.position.copy( coneFrustum.base ).addScaledVector(coneFrustum.axis, coneFrustum.height / 2);
+
+        helperMesh.rotation.set(0, 0, 0)
+        v.set( 0, 1, 0 );
+        const angle = v.angleTo( coneFrustum.axis );
+        const d = v.dot(coneFrustum.axis);
+        v.cross( coneFrustum.axis ).normalize();
+        if ( v.length() > 0 )
+            helperMesh.rotateOnWorldAxis( v, angle );
+        else
+            helperMesh.rotateZ((d < 0 ? Math.PI : 0));
+
+
+        helperMesh.needsUpdate = true
+    }
+
+
     function render() {
         renderer.render(scene, camera)
     }
+
+
+    let gui = new dat.GUI();
+
+    gui.add(params, "C0_X", -20, 20, 0.5).onChange(updateGeom)
+    gui.add(params, "C0_Y", -20, 20, 0.5).onChange(updateGeom)
+    gui.add(params, "C0_Z", -20, 20, 0.5).onChange(updateGeom)
+    gui.add(params, "R0", 0, 10, 0.2).onChange(updateGeom)
+    gui.add(params, "C1_X", -20, 20, 0.5).onChange(updateGeom)
+    gui.add(params, "C1_Y", -20, 20, 0.5).onChange(updateGeom)
+    gui.add(params, "C1_Z", -20, 20, 0.5).onChange(updateGeom)
+    gui.add(params, "R1", 0, 10, 0.2).onChange(updateGeom)
+    gui.add(params, "Scale", 0, 1, 0.1).onChange(updateGeom)
+
+
+    gui.add(params, "Grid").onChange(() => {
+        grid.visible = params.Grid
+        render();
+    })
+
+    gui.add(params, "Axes").onChange(() => {
+        axes.visible = params.Axes;
+        render()
+    })
 </script>
 
 </body>

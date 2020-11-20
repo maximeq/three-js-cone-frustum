@@ -133,9 +133,9 @@
 			const d = new Vector3();
 
 			d.set(
-				Math.sqrt( 1.0 * this.axis.x * this.axis.x ),
-				Math.sqrt( 1.0 * this.axis.y * this.axis.y ),
-				Math.sqrt( 1.0 * this.axis.z * this.axis.z ),
+				Math.sqrt( 1.0 - this.axis.x * this.axis.x ),
+				Math.sqrt( 1.0 - this.axis.y * this.axis.y ),
+				Math.sqrt( 1.0 - this.axis.z * this.axis.z ),
 			);
 			d.multiplyScalar( this.radius0 );
 
@@ -158,6 +158,8 @@
 
 
 		/**
+		 * @deprecated Use `ConeFrustum.computeOptimisedDownscalingBoundingCube` instead
+		 *
 		 * @param {!Vector3} origin		The origin for the current coordinate space
 		 *
 	     * @returns {Float32Array} 		The cube position vertex coordinates as a flat array
@@ -210,21 +212,46 @@
 				throw "Capsule height must not be zero";
 
 			const sinTheta = ( radius1 - radius0 ) / tmpVec1.length();
-			const height = tmpVec1.length() + sinTheta * ( radius0 - ( minScale ) * radius1 );
+			const cosTheta = Math.cos( Math.asin( sinTheta ) );
+			const height = tmpVec1.length() + sinTheta * ( radius0 - ( minScale * minScale ) * radius1 );
+			const unscaledHeight = tmpVec1.length() + sinTheta * ( radius0 - radius1 );
 			tmpVec2.copy( center0 ).addScaledVector( tmpVec1.normalize(), - sinTheta * radius0 );
+
+			const dh = height / unscaledHeight;
 
 			const attribute = baseCubePositions.clone();
 
-			const r = Math.max( radius0, radius1 );
-			tmpMat.makeScale( r, height / 2, r );
+			const r0 = radius0 * cosTheta;
+			const r1 = radius1 * cosTheta;
+
+			const s = r1 > 0 ? r0 / ( r1 * dh ) : 1;
+			const positions = attribute.array;
+			for ( let i = 0; i < positions.length; i += 3 ) {
+
+				if ( positions[ i + 1 ] < 0 ) {
+
+					positions[ i ] *= s;
+					positions[ i + 2 ] *= s;
+
+				}
+
+			}
+
+			tmpMat.makeScale( r1 * dh, height / 2, r1 * dh );
 			tmpMat.applyToBufferAttribute( attribute );
 
 			tmpVec.set( 0, 1, 0 );
 			const angle = tmpVec.angleTo( tmpVec1 );
+			const dot = tmpVec.dot( tmpVec1 );
 			tmpVec.cross( tmpVec1 ).normalize();
 			if ( tmpVec.length() > 0 ) {
 
 				tmpMat.makeRotationAxis( tmpVec, angle );
+				tmpMat.applyToBufferAttribute( attribute );
+
+			} else if ( dot < 0 ) {
+
+				tmpMat.makeRotationZ( Math.PI );
 				tmpMat.applyToBufferAttribute( attribute );
 
 			}
