@@ -190,7 +190,7 @@ class ConeFrustum {
 	 * @param {!number} radius0
 	 * @param {!Vector3} center1
 	 * @param {!number} radius1
-	 * @param {!Vector3} origin		The origin for the current coordinate space
+	 * @param {?Vector3} origin		The origin for the current coordinate space. Can be null.
 	 * @param {?number} minScale
 	 *
 	 * @returns {Float32Array} 		The cube position vertex coordinates as a flat array
@@ -205,15 +205,31 @@ class ConeFrustum {
 		if ( tmpVec1.length() === 0 )
 			throw "Capsule height must not be zero";
 
+		const attribute = baseCubePositions.clone();
+
 		const sinTheta = ( radius1 - radius0 ) / tmpVec1.length();
+
+		if ( Math.abs( sinTheta ) > 1 ) {
+
+			tmpVec1.addVectors( center0, center1 ).multiplyScalar( 0.5 );
+			for ( let i = 0; i < attribute.array.length; i += 3 ) {
+
+				attribute.array[ i ] = tmpVec1.x;
+				attribute.array[ i + 1 ] = tmpVec1.y;
+				attribute.array[ i + 2 ] = tmpVec1.z;
+
+			}
+
+			return attribute.array;
+
+		}
+
 		const cosTheta = Math.cos( Math.asin( sinTheta ) );
 		const height = tmpVec1.length() + sinTheta * ( radius0 - ( minScale * minScale ) * radius1 );
 		const unscaledHeight = tmpVec1.length() + sinTheta * ( radius0 - radius1 );
 		tmpVec2.copy( center0 ).addScaledVector( tmpVec1.normalize(), - sinTheta * radius0 );
 
 		const dh = height / unscaledHeight;
-
-		const attribute = baseCubePositions.clone();
 
 		const r0 = radius0 * cosTheta;
 		const r1 = radius1 * cosTheta;
@@ -250,9 +266,13 @@ class ConeFrustum {
 
 		}
 
-		tmpVec.copy( tmpVec2 ).addScaledVector( tmpVec1, height / 2 ).sub( origin );
-		tmpMat.makeTranslation( tmpVec.x, tmpVec.y, tmpVec.z );
-		tmpMat.applyToBufferAttribute( attribute );
+		if ( origin != null ) {
+
+			tmpVec.copy( tmpVec2 ).addScaledVector( tmpVec1, height / 2 ).sub( origin );
+			tmpMat.makeTranslation( tmpVec.x, tmpVec.y, tmpVec.z );
+			tmpMat.applyToBufferAttribute( attribute );
+
+		}
 
 		return attribute.array;
 
