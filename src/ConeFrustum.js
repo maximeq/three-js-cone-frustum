@@ -284,12 +284,10 @@ class ConeFrustum {
 		const unscaledHeight = tmpVec1.length() + sinTheta * ( radius0 - radius1 );
 		tmpVec2.copy( center0 ).addScaledVector( tmpVec1.normalize(), - sinTheta * radius0 );
 
-		const dh = height / unscaledHeight;
-
 		const r0 = radius0 * cosTheta;
 		const r1 = radius1 * cosTheta;
 
-		let s = r1 > 0 ? r0 / ( r1 * dh ) : 1;
+		let s = r1 > 0 ? r0 / r1 : 1;
 		for ( let i = 0; i < 12; i += 3 ) {
 
 			facePositionsArray[ i ] *= s;
