@@ -206,25 +206,25 @@
 			if ( radius0 > radius1 )
 				return this.computeOptimisedDownscalingBoundingCube( center1, radius1, center0, radius0, origin, minScale );
 
-			const facePositionsArray = new Float32Array([
+			const facePositionsArray = new Float32Array( [
 				// Smaller face
-				-1, -1, -1,
-				1, -1, -1,
-				-1, -1,  1,
-				1, -1,  1,
+				- 1, - 1, - 1,
+				1, - 1, - 1,
+				- 1, - 1, 1,
+				1, - 1, 1,
 
 				// Intermediate face
-				-1,  1, -1,
-				1,  1, -1,
-				-1,  1,  1,
-				1,  1,  1,
+				- 1, 1, - 1,
+				1, 1, - 1,
+				- 1, 1, 1,
+				1, 1, 1,
 
 				// Bigger face
-				-1,  1, -1,
-				1,  1, -1,
-				-1,  1,  1,
-				1,  1,  1,
-			]);
+				- 1, 1, - 1,
+				1, 1, - 1,
+				- 1, 1, 1,
+				1, 1, 1,
+			] );
 
 			const indexes = [
 				// Small face
@@ -237,23 +237,25 @@
 				4, 5, 1,		4, 1, 0,
 
 				// Intermediate to big faces
-				10,  8,  4,		10, 4, 6,
-				11, 10,  6,		11, 6, 7,
-				9,  11,  7,		 9, 7, 5,
-				8,   9,  5,		 8, 5, 4,
+				10, 8, 4,		10, 4, 6,
+				11, 10, 6,		11, 6, 7,
+				9, 11, 7,		 9, 7, 5,
+				8, 9, 5,		 8, 5, 4,
 
 				// Big face
 				9, 8, 10,		9, 10, 11,
 			];
 
-			const toPositions = function() {
+			const toPositions = function () {
 
-				const positions = new Float32Array(indexes.length * 3);
-				for (let i = 0; i < indexes.length; i++) {
-					const p = indexes[i] * 3;
-					positions[3*i] = facePositionsArray[p];
-					positions[3*i+1] = facePositionsArray[p+1];
-					positions[3*i+2] = facePositionsArray[p+2];
+				const positions = new Float32Array( indexes.length * 3 );
+				for ( let i = 0; i < indexes.length; i ++ ) {
+
+					const p = indexes[ i ] * 3;
+					positions[ 3 * i ] = facePositionsArray[ p ];
+					positions[ 3 * i + 1 ] = facePositionsArray[ p + 1 ];
+					positions[ 3 * i + 2 ] = facePositionsArray[ p + 2 ];
+
 				}
 
 				return positions;
@@ -267,7 +269,7 @@
 
 			const sinTheta = ( radius1 - radius0 ) / tmpVec1.length();
 
-			if ( Math.abs( sinTheta ) > 1 ) {
+			if ( Math.abs( sinTheta ) >= 1 / minScale * 0.9999 ) {
 
 				tmpVec1.addVectors( center0, center1 ).multiplyScalar( 0.5 );
 				for ( let i = 0; i < facePositionsArray.length; i += 3 ) {
@@ -280,7 +282,8 @@
 
 				return toPositions();
 
-			}
+			} else if ( Math.abs( sinTheta ) > 1 )
+				return this.computeOptimisedDownscalingBoundingCube( center0, minScale * radius0, center1, minScale * radius1, origin, 1 );
 
 			const cosTheta = Math.cos( Math.asin( sinTheta ) );
 			const height = tmpVec1.length() + sinTheta * ( radius0 - ( minScale * minScale ) * radius1 );
@@ -300,7 +303,7 @@
 
 			}
 
-			s = Math.cos(Math.asin( minScale * sinTheta)) * radius1 * minScale / r1;
+			s = Math.cos( Math.asin( minScale * sinTheta ) ) * radius1 * minScale / r1;
 			for ( let i = 24; i < 36; i += 3 ) {
 
 				facePositionsArray[ i ] *= s;
@@ -309,12 +312,12 @@
 			}
 
 			const newY = 2 * unscaledHeight / height - 1;
-			for (let i = 12; i < 24; i += 3)
-				facePositionsArray[i + 1] = newY;
+			for ( let i = 12; i < 24; i += 3 )
+				facePositionsArray[ i + 1 ] = newY;
 
-			const attribute = new threeFull.BufferAttribute(toPositions(), 3);
+			const attribute = new threeFull.BufferAttribute( toPositions(), 3 );
 
-			tmpMat.makeScale( r1 , height / 2, r1 );
+			tmpMat.makeScale( r1, height / 2, r1 );
 			tmpMat.applyToBufferAttribute( attribute );
 
 			tmpVec.set( 0, 1, 0 );
