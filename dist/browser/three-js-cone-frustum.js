@@ -170,7 +170,7 @@
 
 			const r = Math.max( this.radius0, this.radius1 );
 			tmpMat.makeScale( r, this.height / 2, r );
-			tmpMat.applyToBufferAttribute( attribute );
+			attribute.applyMatrix4( tmpMat );
 
 			tmpVec.set( 0, 1, 0 );
 			const angle = tmpVec.angleTo( this.axis );
@@ -178,13 +178,13 @@
 			if ( tmpVec.length() > 0 ) {
 
 				tmpMat.makeRotationAxis( tmpVec, angle );
-				tmpMat.applyToBufferAttribute( attribute );
+				attribute.applyMatrix4( tmpMat );
 
 			}
 
 			tmpVec.copy( this.base ).addScaledVector( this.axis, this.height / 2 ).sub( origin );
 		    tmpMat.makeTranslation( tmpVec.x, tmpVec.y, tmpVec.z );
-		    tmpMat.applyToBufferAttribute( attribute );
+		    attribute.applyMatrix4( tmpMat );
 
 		    return attribute.array;
 
@@ -316,7 +316,7 @@
 			const attribute = new threeFull.BufferAttribute( toPositions(), 3 );
 
 			tmpMat.makeScale( r1, height / 2, r1 );
-			tmpMat.applyToBufferAttribute( attribute );
+			attribute.applyMatrix4( tmpMat );
 
 			tmpVec.set( 0, 1, 0 );
 			const angle = tmpVec.angleTo( tmpVec1 );
@@ -325,12 +325,12 @@
 			if ( tmpVec.length() > 0 ) {
 
 				tmpMat.makeRotationAxis( tmpVec, angle );
-				tmpMat.applyToBufferAttribute( attribute );
+				attribute.applyMatrix4( tmpMat );
 
 			} else if ( dot < 0 ) {
 
 				tmpMat.makeRotationZ( Math.PI );
-				tmpMat.applyToBufferAttribute( attribute );
+				attribute.applyMatrix4( tmpMat );
 
 			}
 
@@ -338,7 +338,7 @@
 
 				tmpVec.copy( tmpVec2 ).addScaledVector( tmpVec1, height / 2 ).sub( origin );
 				tmpMat.makeTranslation( tmpVec.x, tmpVec.y, tmpVec.z );
-				tmpMat.applyToBufferAttribute( attribute );
+				attribute.applyMatrix4( tmpMat );
 
 			}
 
