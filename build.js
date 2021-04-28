@@ -25,15 +25,15 @@ async function build(inputOptions, outputOptions) {
  ******************************************/
 
 build({
-    input: 'src/ConeFrustum.js',
+    input: 'src/export.js',
     plugins:  [ commonjs(), resolve() ],
-    external: [ 'three-full' ],
+    external: [ '@dualbox/three' ],
 }, {
     format: 'umd',
     name: 'THREEConeFrustum',
     file: './dist/browser/three-js-cone-frustum.js',
     globals: {
-        'three-full' : 'THREE'
+        '@dualbox/three' : 'THREE'
     }
 });
 
@@ -43,7 +43,7 @@ build({
  ******************************************/
 
 build({
-    input: 'src/ConeFrustum.js',
+    input: 'src/export.js',
     plugins:  [
         commonjs(),
         resolve(),
@@ -55,13 +55,13 @@ build({
           bracketSpacing:false
         })
     ],
-    external: [ 'three-full' ],
+    external: [ '@dualbox/three' ],
 }, {
     format: 'umd',
     name: 'THREEConeFrustum',
     file: './dist/browser/three-js-cone-frustum.min.js',
     globals: {
-        'three-full' : 'THREE'
+        '@dualbox/three' : 'THREE'
     }
 });
 

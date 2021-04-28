@@ -1,9 +1,4 @@
-const THREE = require( "three-full" );
-
-const Box3 = THREE.Box3;
-const Vector3 = THREE.Vector3;
-const Matrix4 = THREE.Matrix4;
-const BoxBufferGeometry = THREE.BoxBufferGeometry;
+import {Box3, Vector3, Matrix4, BoxBufferGeometry, BufferAttribute} from "@dualbox/three";
 
 const tmpVec = new Vector3(), tmpVec1 = new Vector3(), tmpVec2 = new Vector3(), tmpVec3 = new Vector3();
 const tmpMat = new Matrix4();
@@ -306,7 +301,7 @@ export class ConeFrustum {
 		for ( let i = 12; i < 24; i += 3 )
 			facePositionsArray[ i + 1 ] = newY;
 
-		const attribute = new THREE.BufferAttribute( toPositions(), 3 );
+		const attribute = new BufferAttribute( toPositions(), 3 );
 
 		tmpMat.makeScale( r1, height / 2, r1 );
 		attribute.applyMatrix4( tmpMat );
@@ -355,112 +350,3 @@ export class ConeFrustum {
 	}
 
 }
-
-
-THREE.ConeFrustum = ConeFrustum;
-
-
-THREE.Ray.prototype.intersectsConeFrustum = function () {
-
-	const D = new Vector3();
-	const target2 = new Vector3();
-	const u = new Vector3();
-
-	return function ( frustum, target ) {
-
-		if ( target == null )
-			target = target2;
-
-		const deltaR = frustum.radius1 - frustum.radius0;
-		const r = 1 + Math.pow( deltaR / frustum.height, 2 );
-		const R = frustum.radius0 * deltaR / frustum.height;
-
-		D.subVectors( this.origin, frustum.base );
-		const DdA = D.dot( frustum.axis );
-		const DdD = D.dot( D );
-		const VdA = this.direction.dot( frustum.axis );
-		const VdD = this.direction.dot( D );
-		const VdV = this.direction.dot( this.direction );
-
-		const c0 = frustum.radius0 * frustum.radius0 + 2 * R * DdA + r * DdA * DdA - DdD;
-		const c1 = R * VdA + r * DdA * VdA - VdD;
-		const c2 = r * VdA * VdA - VdV;
-
-		if ( c2 !== 0 ) {
-
-			const discr = c1 * c1 - c2 * c0;
-
-			if ( discr < 0 )
-				return null;
-
-			else if ( discr === 0 ) {
-
-				const t = - c1 / c2;
-				u.copy( D );
-				u.addScaledVector( this.direction, t );
-				const d = frustum.axis.dot( u );
-
-				if ( t >= 0 && d >= 0 && d <= frustum.height ) {
-
-					target2.addVectors( frustum.base, u );
-					target.copy( target2 );
-					return target2;
-
-				}
-
-			} else {
-
-				let quantity = 0;
-				const root = Math.sqrt( discr );
-
-				const t0 = ( - c1 - root ) / c2;
-				u.copy( D );
-				u.addScaledVector( this.direction, t0 );
-				let d = frustum.axis.dot( u );
-
-				if ( t0 >= 0 && d >= 0 && d <= frustum.height ) {
-
-					target2.addVectors( frustum.base, u );
-					quantity ++;
-
-				}
-
-				const t1 = ( - c1 + root ) / c2;
-				u.copy( D );
-				u.addScaledVector( this.direction, t1 );
-				d = frustum.axis.dot( u );
-
-				if ( t1 >= 0 && ( quantity === 0 || t0 > t1 ) && d >= 0 && d <= frustum.height ) {
-
-					target2.addVectors( frustum.base, u );
-					quantity ++;
-
-				}
-
-				if ( quantity ) target.copy( target2 );
-				return quantity ? target2 : null;
-
-			}
-
-		} else if ( c1 !== 0 ) {
-
-			const t = - 2 * c0 / c1;
-			u.copy( D );
-			u.addScaledVector( this.direction, t );
-			const d = frustum.axis.dot( u );
-
-			if ( t >= 0 && d >= 0 && d <= frustum.height ) {
-
-				target2.addVectors( frustum.base, u );
-				target.copy( target2 );
-				return target;
-
-			}
-
-		}
-
-		return null;
-
-	};
-
-}();

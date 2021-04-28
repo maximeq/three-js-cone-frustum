@@ -2,7 +2,7 @@
   "name": "three-js-cone-frustum",
   "version": "1.122.0",
   "description": "THREE.JS ConeFrustum class, on the model of THREE.Sphere class.",
-  "main": "src/ConeFrustum.js",
+  "main": "src/export.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "node build.js"
