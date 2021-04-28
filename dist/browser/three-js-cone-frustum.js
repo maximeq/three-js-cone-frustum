@@ -1,15 +1,15 @@
 (function (global, factory) {
-	typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('three-full')) :
-	typeof define === 'function' && define.amd ? define(['three-full'], factory) :
-	(global.THREEConeFrustum = factory(global.THREE));
-}(this, (function (threeFull) { 'use strict';
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
+	typeof define === 'function' && define.amd ? define(['exports'], factory) :
+	(factory((global.THREEConeFrustum = {})));
+}(this, (function (exports) { 'use strict';
 
-	threeFull = threeFull && threeFull.hasOwnProperty('default') ? threeFull['default'] : threeFull;
+	const THREE = require( "three-full" );
 
-	const Box3 = threeFull.Box3;
-	const Vector3 = threeFull.Vector3;
-	const Matrix4 = threeFull.Matrix4;
-	const BoxBufferGeometry = threeFull.BoxBufferGeometry;
+	const Box3 = THREE.Box3;
+	const Vector3 = THREE.Vector3;
+	const Matrix4 = THREE.Matrix4;
+	const BoxBufferGeometry = THREE.BoxBufferGeometry;
 
 	const tmpVec = new Vector3(), tmpVec1 = new Vector3(), tmpVec2 = new Vector3(), tmpVec3 = new Vector3();
 	const tmpMat = new Matrix4();
@@ -209,21 +209,21 @@
 			const facePositionsArray = new Float32Array( [
 				// Smaller face
 				- 1, - 1, - 1,
-				1, - 1, - 1,
-				- 1, - 1, 1,
-				1, - 1, 1,
+				  1, - 1, - 1,
+				- 1, - 1,   1,
+				  1, - 1,   1,
 
 				// Intermediate face
 				- 1, 1, - 1,
-				1, 1, - 1,
-				- 1, 1, 1,
-				1, 1, 1,
+				  1, 1, - 1,
+				- 1, 1,   1,
+				  1, 1,   1,
 
 				// Bigger face
 				- 1, 1, - 1,
-				1, 1, - 1,
-				- 1, 1, 1,
-				1, 1, 1,
+				  1, 1, - 1,
+				- 1, 1,   1,
+				  1, 1,   1,
 			] );
 
 			const indexes = [
@@ -313,7 +313,7 @@
 			for ( let i = 12; i < 24; i += 3 )
 				facePositionsArray[ i + 1 ] = newY;
 
-			const attribute = new threeFull.BufferAttribute( toPositions(), 3 );
+			const attribute = new THREE.BufferAttribute( toPositions(), 3 );
 
 			tmpMat.makeScale( r1, height / 2, r1 );
 			attribute.applyMatrix4( tmpMat );
@@ -364,10 +364,10 @@
 	}
 
 
-	threeFull.ConeFrustum = ConeFrustum;
+	THREE.ConeFrustum = ConeFrustum;
 
 
-	threeFull.Ray.prototype.intersectsConeFrustum = function () {
+	THREE.Ray.prototype.intersectsConeFrustum = function () {
 
 		const D = new Vector3();
 		const target2 = new Vector3();
@@ -472,10 +472,8 @@
 
 	}();
 
-	var ConeFrustum_1 = {
+	exports.ConeFrustum = ConeFrustum;
 
-	};
-
-	return ConeFrustum_1;
+	Object.defineProperty(exports, '__esModule', { value: true });
 
 })));

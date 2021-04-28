@@ -14,7 +14,7 @@ const baseCubePositions = new BoxBufferGeometry( 2, 2, 2 ).toNonIndexed().attrib
  */
 
 
-class ConeFrustum {
+export class ConeFrustum {
 
 	/**
      * @param base      {?Vector3}
@@ -22,7 +22,6 @@ class ConeFrustum {
      * @param height    {?number}
      * @param radius0   {?number}
      * @param radius1   {?number}
-	 * @param minScaleTop  {?Vector3}
      */
 	constructor( base, axis, height, radius0, radius1 ) {
 
@@ -203,21 +202,21 @@ class ConeFrustum {
 		const facePositionsArray = new Float32Array( [
 			// Smaller face
 			- 1, - 1, - 1,
-			1, - 1, - 1,
-			- 1, - 1, 1,
-			1, - 1, 1,
+			  1, - 1, - 1,
+			- 1, - 1,   1,
+			  1, - 1,   1,
 
 			// Intermediate face
 			- 1, 1, - 1,
-			1, 1, - 1,
-			- 1, 1, 1,
-			1, 1, 1,
+			  1, 1, - 1,
+			- 1, 1,   1,
+			  1, 1,   1,
 
 			// Bigger face
 			- 1, 1, - 1,
-			1, 1, - 1,
-			- 1, 1, 1,
-			1, 1, 1,
+			  1, 1, - 1,
+			- 1, 1,   1,
+			  1, 1,   1,
 		] );
 
 		const indexes = [
