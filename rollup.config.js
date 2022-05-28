@@ -9,7 +9,7 @@ export default {
         file: './dist/browser/three-js-cone-frustum.js',
         format: 'cjs'
     },
-    external: ['three-full'],
+    external: ['@dualbox/three', 'three'],
     plugins: [
         commonjs(), // prise en charge de require
         resolve(), // prise en charge des modules depuis node_modules
