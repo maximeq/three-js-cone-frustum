@@ -1,9 +1,8 @@
 import "./RayIntersect"
 import { ConeFrustum } from "./ConeFrustum";
 
-export { ConeFrustum }
+export { ConeFrustum };
 
+import THREE from '@dualbox/three';
 
-import THREE from '@dualbox/three'
-
-THREE.ConeFrustum = ConeFrustum
+THREE.ConeFrustum = ConeFrustum;
