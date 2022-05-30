@@ -1,16 +1,15 @@
-(function (global, factory) {
-    typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('@dualbox/three')) :
-    typeof define === 'function' && define.amd ? define(['exports', '@dualbox/three'], factory) :
-    (factory((global.THREEConeFrustum = {}),global.THREE));
-}(this, (function (exports,THREE) { 'use strict';
+var THREEConeFrustum = (function (exports, THREE) {
+    'use strict';
 
-    var THREE__default = 'default' in THREE ? THREE['default'] : THREE;
+    function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
 
-    THREE__default.Ray.prototype.intersectsConeFrustum = function () {
+    var THREE__default = /*#__PURE__*/_interopDefaultLegacy(THREE);
 
-        const D = new THREE__default.Vector3();
-        const target2 = new THREE__default.Vector3();
-        const u = new THREE__default.Vector3();
+    THREE__default["default"].Ray.prototype.intersectsConeFrustum = function () {
+
+        const D = new THREE__default["default"].Vector3();
+        const target2 = new THREE__default["default"].Vector3();
+        const u = new THREE__default["default"].Vector3();
 
         return function ( frustum, target ) {
 
@@ -111,7 +110,7 @@
 
     }();
 
-    const tmpVec = new THREE.Vector3(), tmpVec1 = new THREE.Vector3(), tmpVec2 = new THREE.Vector3(), tmpVec3 = new THREE.Vector3();
+    const tmpVec = new THREE.Vector3(); new THREE.Vector3(); const tmpVec2 = new THREE.Vector3(); new THREE.Vector3();
     const tmpMat = new THREE.Matrix4();
     const baseCubePositions = new THREE.BoxBufferGeometry( 2, 2, 2 ).toNonIndexed().attributes.position;
 
@@ -462,10 +461,13 @@
 
     }
 
-    THREE__default.ConeFrustum = ConeFrustum;
+    THREE__default["default"].ConeFrustum = ConeFrustum;
 
     exports.ConeFrustum = ConeFrustum;
 
     Object.defineProperty(exports, '__esModule', { value: true });
 
-})));
+    return exports;
+
+})({}, THREE);
+//# sourceMappingURL=three-js-cone-frustum.js.map
