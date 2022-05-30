@@ -125,7 +125,7 @@
             c1, params.R1,
             new THREE.Vector3(), params.Scale
         );
-        geom.addAttribute('position', new THREE.BufferAttribute(positions, 3))
+        geom.setAttribute('position', new THREE.BufferAttribute(positions, 3))
         geom.computeVertexNormals();
 
         mesh.geometry = geom;
