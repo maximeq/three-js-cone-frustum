@@ -3,7 +3,7 @@
   "version": "2.130.0",
   "description": "THREE.JS ConeFrustum class, on the model of THREE.Sphere class.",
   "main": "./dist/three-js-cone.cjs",
-  "module": "src/export.js",
+  "module": "src/check-wrapper.js",
   "browser": "./dist/three-js-cone.min.js",
   "scripts": {
     "build": "npx rollup -c",
@@ -12,7 +12,8 @@
     "dev": "npm run build && npm run start"
   },
   "dependencies": {
-    "@dualbox/three": "1.130.x"
+    "@dualbox/three": "1.130.x",
+    "three-js-checker": "1.0.x"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^22.0.0",

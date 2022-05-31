@@ -1,10 +1,40 @@
-import THREE, { Vector3, Matrix4, BoxBufferGeometry, Box3, BufferAttribute } from '@dualbox/three';
+import { Ray, Vector3, Matrix4, BoxBufferGeometry, Box3, BufferAttribute } from '@dualbox/three';
 
-THREE.Ray.prototype.intersectsConeFrustum = function () {
+function checkDependancy(packageName, dependancyName, dependancy) {
+    let duplicationMessage = `${packageName}: ${dependancyName} is duplicated. Your bundle includes ${dependancyName} twice. Please repair your bundle.`;
+    try {
+        if (THREE[dependancyName] === undefined) {
+            THREE[dependancyName] = dependancy;
+            return;
+        }
 
-    const D = new THREE.Vector3();
-    const target2 = new THREE.Vector3();
-    const u = new THREE.Vector3();
+        if (THREE[dependancyName] !== dependancy) {
+            throw duplicationMessage;
+        }
+    } catch (error) {
+        if (error !== duplicationMessage) {
+            console.warn(
+                `${packageName}: Duplication check unavailable.` + error
+            );
+        } else {
+            throw error;
+        }
+    }
+}
+
+function checkThreeRevision(packageName, revision) {
+    if (THREE.REVISION != revision) {
+        console.error(
+            `${packageName} depends on THREE revision ${revision}, but current revision is ${THREE.REVISION}.`
+        );
+    }
+}
+
+Ray.prototype.intersectsConeFrustum = function () {
+
+    const D = new Vector3();
+    const target2 = new Vector3();
+    const u = new Vector3();
 
     return function ( frustum, target ) {
 
@@ -456,6 +486,15 @@ class ConeFrustum {
 
 }
 
-THREE.ConeFrustum = ConeFrustum;
+/*
+ * This file encapsulates the xthree library.
+ * It checks if the needed three examples and the library are duplicated.
+ */
+
+const PACKAGE_NAME = "three-js-cone-frustum";
+
+checkThreeRevision(PACKAGE_NAME, 130);
+
+checkDependancy(PACKAGE_NAME, "ConeFrustum", ConeFrustum);
 
 export { ConeFrustum };

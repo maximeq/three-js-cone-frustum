@@ -14,7 +14,7 @@ const globals = { "@dualbox/three": "THREE" };
 
 export default {
     // entrypoint
-    input: "./src/exports.js",
+    input: "./src/check-wrapper.js",
 
     // common options
     plugins: [
