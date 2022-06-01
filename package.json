@@ -1,6 +1,6 @@
 {
   "name": "three-js-cone-frustum",
-  "version": "2.130.0",
+  "version": "2.130.1",
   "description": "THREE.JS ConeFrustum class, on the model of THREE.Sphere class.",
   "main": "./dist/three-js-cone.cjs",
   "module": "src/check-wrapper.js",
