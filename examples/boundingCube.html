@@ -33,13 +33,9 @@
 
 <body>
 
-<script src="../node_modules/three-full/builds/Three.iife.js"></script>
-<script>
-    var THREE = THREE || Three
-</script>
-
-<script src="../dist/browser/three-js-cone-frustum.js"></script>
-
+<script src="../node_modules/@dualbox/three/build/three.js"></script>
+<script src="../node_modules/@dualbox/three/examples/js/controls/OrbitControls.js"></script>
+<script src="../dist/three-js-cone-frustum.js"></script>
 <script src="../node_modules/dat.gui/build/dat.gui.min.js"></script>
 
 <script>
@@ -129,7 +125,7 @@
             c1, params.R1,
             new THREE.Vector3(), params.Scale
         );
-        geom.addAttribute('position', new THREE.BufferAttribute(positions, 3))
+        geom.setAttribute('position', new THREE.BufferAttribute(positions, 3))
         geom.computeVertexNormals();
 
         mesh.geometry = geom;

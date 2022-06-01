@@ -1,11 +1,11 @@
-import THREE from "@dualbox/three";
+import {Ray, Vector3} from "@dualbox/three";
 
 
-THREE.Ray.prototype.intersectsConeFrustum = function () {
+Ray.prototype.intersectsConeFrustum = function () {
 
-    const D = new THREE.Vector3();
-    const target2 = new THREE.Vector3();
-    const u = new THREE.Vector3();
+    const D = new Vector3();
+    const target2 = new Vector3();
+    const u = new Vector3();
 
     return function ( frustum, target ) {
 

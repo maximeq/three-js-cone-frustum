@@ -1,16 +1,41 @@
-(function (global, factory) {
-    typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('@dualbox/three')) :
-    typeof define === 'function' && define.amd ? define(['exports', '@dualbox/three'], factory) :
-    (factory((global.THREEConeFrustum = {}),global.THREE));
-}(this, (function (exports,THREE) { 'use strict';
+var THREEConeFrustum = (function (exports, three) {
+    'use strict';
 
-    var THREE__default = 'default' in THREE ? THREE['default'] : THREE;
+    function checkDependancy(packageName, dependancyName, dependancy) {
+        let duplicationMessage = `${packageName}: ${dependancyName} is duplicated. Your bundle includes ${dependancyName} twice. Please repair your bundle.`;
+        try {
+            if (THREE[dependancyName] === undefined) {
+                THREE[dependancyName] = dependancy;
+                return;
+            }
 
-    THREE__default.Ray.prototype.intersectsConeFrustum = function () {
+            if (THREE[dependancyName] !== dependancy) {
+                throw duplicationMessage;
+            }
+        } catch (error) {
+            if (error !== duplicationMessage) {
+                console.warn(
+                    `${packageName}: Duplication check unavailable.` + error
+                );
+            } else {
+                throw error;
+            }
+        }
+    }
 
-        const D = new THREE__default.Vector3();
-        const target2 = new THREE__default.Vector3();
-        const u = new THREE__default.Vector3();
+    function checkThreeRevision(packageName, revision) {
+        if (THREE.REVISION != revision) {
+            console.error(
+                `${packageName} depends on THREE revision ${revision}, but current revision is ${THREE.REVISION}.`
+            );
+        }
+    }
+
+    three.Ray.prototype.intersectsConeFrustum = function () {
+
+        const D = new three.Vector3();
+        const target2 = new three.Vector3();
+        const u = new three.Vector3();
 
         return function ( frustum, target ) {
 
@@ -111,9 +136,9 @@
 
     }();
 
-    const tmpVec = new THREE.Vector3(), tmpVec1 = new THREE.Vector3(), tmpVec2 = new THREE.Vector3(), tmpVec3 = new THREE.Vector3();
-    const tmpMat = new THREE.Matrix4();
-    const baseCubePositions = new THREE.BoxBufferGeometry( 2, 2, 2 ).toNonIndexed().attributes.position;
+    const tmpVec = new three.Vector3(); new three.Vector3(); const tmpVec2 = new three.Vector3(); new three.Vector3();
+    const tmpMat = new three.Matrix4();
+    const baseCubePositions = new three.BoxBufferGeometry( 2, 2, 2 ).toNonIndexed().attributes.position;
 
     /**
      * @author Max Godefroy <max@godefroy.net>
@@ -131,9 +156,9 @@
          */
     	constructor( base, axis, height, radius0, radius1 ) {
 
-    		this.base = base || new THREE.Vector3();
+    		this.base = base || new three.Vector3();
 
-    		this.axis = axis || new THREE.Vector3( 0, 1, 0 );
+    		this.axis = axis || new three.Vector3( 0, 1, 0 );
     		this.axis.normalize();
 
     		this.height = height || 1;
@@ -155,14 +180,14 @@
     		if ( radius0 > radius1 )
     			return this.fromCapsule( center1, radius1, center0, radius0 );
 
-    		const axis = new THREE.Vector3().subVectors( center1, center0 );
+    		const axis = new three.Vector3().subVectors( center1, center0 );
 
     		if ( axis.length() === 0 )
     			throw "Capsule height must not be zero";
 
     		const sinTheta = ( radius1 - radius0 ) / axis.length();
     		const height = axis.length() + sinTheta * ( radius0 - radius1 );
-    		const base = new THREE.Vector3().copy( center0 ).addScaledVector( axis.normalize(), - sinTheta * radius0 );
+    		const base = new three.Vector3().copy( center0 ).addScaledVector( axis.normalize(), - sinTheta * radius0 );
     		const cosTheta = Math.cos( Math.asin( sinTheta ) );
 
     		return new ConeFrustum( base, axis, height, radius0 * cosTheta, radius1 * cosTheta );
@@ -229,7 +254,7 @@
     	getBoundingBox( target ) {
 
     		const c = this.base.clone();
-    		const d = new THREE.Vector3();
+    		const d = new three.Vector3();
 
     		d.set(
     			Math.sqrt( 1.0 - this.axis.x * this.axis.x ),
@@ -238,13 +263,13 @@
     		);
     		d.multiplyScalar( this.radius0 );
 
-    		const box1 = new THREE.Box3( new THREE.Vector3().subVectors( c, d ), new THREE.Vector3().addVectors( c, d ) );
+    		const box1 = new three.Box3( new three.Vector3().subVectors( c, d ), new three.Vector3().addVectors( c, d ) );
 
     		d.divideScalar( this.radius0 );
     		d.multiplyScalar( this.radius1 );
 
     		c.addScaledVector( this.axis, this.height );
-    		const box2 = new THREE.Box3( new THREE.Vector3().subVectors( c, d ), new THREE.Vector3().addVectors( c, d ) );
+    		const box2 = new three.Box3( new three.Vector3().subVectors( c, d ), new three.Vector3().addVectors( c, d ) );
 
     		box1.union( box2 );
 
@@ -361,7 +386,7 @@
 
     		};
 
-    		const tmpVec1 = new THREE.Vector3().subVectors( center1, center0 );
+    		const tmpVec1 = new three.Vector3().subVectors( center1, center0 );
 
     		if ( tmpVec1.length() === 0 )
     			throw "Capsule height must not be zero";
@@ -412,7 +437,7 @@
     		for ( let i = 12; i < 24; i += 3 )
     			facePositionsArray[ i + 1 ] = newY;
 
-    		const attribute = new THREE.BufferAttribute( toPositions(), 3 );
+    		const attribute = new three.BufferAttribute( toPositions(), 3 );
 
     		tmpMat.makeScale( r1, height / 2, r1 );
     		attribute.applyMatrix4( tmpMat );
@@ -462,10 +487,22 @@
 
     }
 
-    THREE__default.ConeFrustum = ConeFrustum;
+    /*
+     * This file encapsulates the xthree library.
+     * It checks if the needed three examples and the library are duplicated.
+     */
+
+    const PACKAGE_NAME = "three-js-cone-frustum";
+
+    checkThreeRevision(PACKAGE_NAME, 130);
+
+    checkDependancy(PACKAGE_NAME, "ConeFrustum", ConeFrustum);
 
     exports.ConeFrustum = ConeFrustum;
 
     Object.defineProperty(exports, '__esModule', { value: true });
 
-})));
+    return exports;
+
+})({}, THREE);
+//# sourceMappingURL=three-js-cone-frustum.js.map
